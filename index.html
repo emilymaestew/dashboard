@@ -623,6 +623,18 @@
 
   .card input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .cardrow { display: flex; gap: 8px; align-items: center; }
+  .btn.wide { width: 100%; padding: 12px 16px; }
+
+  .orline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 12px !important;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .orline::before, .orline::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   .cardmsg { font-size: 13px; margin-top: 12px; color: var(--muted); line-height: 1.45; }
   .cardmsg.bad { color: var(--crit); }
   .cardmsg.good { color: var(--good); }
@@ -754,7 +766,7 @@
   <footer class="foot">
     <span>Learning Suite and Canvas pulled Sep 2, 2026. Work and club items from Gmail, same day. FIN 326 had nothing posted.</span>
     <span class="sync" id="sync">Saved in this browser</span>
-    <span class="sync" id="build">Build 2026-09-05-auth</span>
+    <span class="sync" id="build">Build 2026-09-05-auth2</span>
     <span id="account"></span>
   </footer>
 </div>
@@ -762,10 +774,12 @@
 <div class="veil" id="signin" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="signin-h">
     <h2 id="signin-h">Sign in to sync</h2>
-    <p>Your checkmarks and edits will follow you between your laptop and your phone. We email you a link, so there is no password to remember.</p>
+    <p>Your checkmarks and edits will follow you between your laptop and your phone.</p>
+    <button class="btn wide" type="button" id="signin-gh">Continue with GitHub</button>
+    <p class="orline"><span>or use email</span></p>
     <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
     <div class="cardrow">
-      <button class="btn" type="button" id="signin-go">Email me a link</button>
+      <button class="minibtn ghost" type="button" id="signin-go">Email me a link</button>
       <button class="minibtn ghost" type="button" id="signin-close">Not now</button>
     </div>
     <p class="cardmsg" id="signin-msg"></p>
@@ -1649,6 +1663,21 @@
     email.addEventListener("keydown", function (ev) {
       if (ev.key === "Enter") { ev.preventDefault(); go.click(); }
       if (ev.key === "Escape") closeSignIn();
+    });
+
+    var gh = document.getElementById("signin-gh");
+    gh.addEventListener("click", function () {
+      msg.className = "cardmsg";
+      msg.textContent = "Opening GitHub\u2026";
+      sb.auth.signInWithOAuth({
+        provider: "github",
+        options: { redirectTo: window.location.href.split("#")[0] }
+      }).then(function (res) {
+        if (res.error) {
+          msg.className = "cardmsg bad";
+          msg.textContent = res.error.message;
+        }
+      });
     });
 
     go.addEventListener("click", function () {
