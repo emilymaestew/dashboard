@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<style>
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+  :root {
+    --ground: #eef1f4;
+    --surface: #ffffff;
+    --surface-2: #f7f9fb;
+    --line: #d9e0e7;
+    --line-soft: #e8edf2;
+    --ink: #101e2b;
+    --ink-2: #3b4b5a;
+    --muted: #5f7182;
+    --accent: #0b5fa5;
+    --accent-soft: #e3eef8;
+    --crit: #b3261e;
+    --warn: #a35c00;
+    --good: #256e51;
+    --c-fin400: #002e5d;
+    --c-fin453: #0f6e6e;
+    --c-stat121: #57478a;
+    --c-is111: #a35124;
+    --c-fin326: #5d6b7a;
+    --c-byu: #3f4a55;
+    --c-club: #8c2f68;
+    --c-job: #4a6220;
+    --c-life: #2b6a4e;
+    --shadow: 0 1px 2px rgba(16, 30, 43, .06), 0 4px 14px rgba(16, 30, 43, .05);
+    --radius: 10px;
+    --font-ui: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+    --font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0d141a;
+      --surface: #151d25;
+      --surface-2: #1a242d;
+      --line: #2a3742;
+      --line-soft: #222e38;
+      --ink: #e6ecf2;
+      --ink-2: #c2cedb;
+      --muted: #90a2b2;
+      --accent: #64abe8;
+      --accent-soft: #16303f;
+      --crit: #f08a80;
+      --warn: #e0a34a;
+      --good: #66c39a;
+      --c-fin400: #6ba4dd;
+      --c-fin453: #4fb5b0;
+      --c-stat121: #a493d9;
+      --c-is111: #e08b58;
+      --c-fin326: #93a5b6;
+      --c-byu: #93a5b6;
+      --c-club: #dd7ab3;
+      --c-job: #9dbd63;
+      --c-life: #6cbd94;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .22);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0d141a;
+    --surface: #151d25;
+    --surface-2: #1a242d;
+    --line: #2a3742;
+    --line-soft: #222e38;
+    --ink: #e6ecf2;
+    --ink-2: #c2cedb;
+    --muted: #90a2b2;
+    --accent: #64abe8;
+    --accent-soft: #16303f;
+    --crit: #f08a80;
+    --warn: #e0a34a;
+    --good: #66c39a;
+    --c-fin400: #6ba4dd;
+    --c-fin453: #4fb5b0;
+    --c-stat121: #a493d9;
+    --c-is111: #e08b58;
+    --c-fin326: #93a5b6;
+    --c-byu: #93a5b6;
+    --c-club: #dd7ab3;
+    --c-job: #9dbd63;
+    --c-life: #6cbd94;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .22);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 20px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .masthead .dateline {
+    font-family: var(--font-data);
+    font-size: 12px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+
+  .nextup { text-align: right; min-width: 220px; }
+
+  .nextup .lbl {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .nextup .thing { font-weight: 600; font-size: 15px; line-height: 1.3; }
+  .nextup .when { font-family: var(--font-data); font-size: 13px; color: var(--crit); font-weight: 500; }
+
+  /* ---------- bucket cards ---------- */
+  .buckets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+  }
+
+  .bcard {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 15px 13px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color .12s ease;
+  }
+
+  .bcard:hover { border-color: var(--muted); }
+  .bcard:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .bcard[aria-pressed="true"] { border-color: var(--ink); box-shadow: var(--shadow), inset 0 0 0 1px var(--ink); }
+
+  .bcard .bname {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .bcard .bname .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bar, var(--muted)); flex: none; }
+
+  .bcard .bcount {
+    font-family: var(--font-data);
+    font-size: 24px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .bcard .bcount span { font-size: 14px; color: var(--muted); }
+
+  .track { height: 4px; border-radius: 2px; background: var(--line-soft); overflow: hidden; }
+  .track > i { display: block; height: 100%; background: var(--bar, var(--accent)); border-radius: 2px; transition: width .25s ease; }
+
+  .bcard .bsub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* ---------- notes strip ---------- */
+  .notes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .noteslbl {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-right: 2px;
+  }
+
+  .notelink {
+    font: 500 13px/1 var(--font-ui);
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color .12s ease, color .12s ease;
+  }
+
+  .notelink:hover { border-color: var(--hue, var(--muted)); color: var(--ink); }
+  .notelink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .notelink .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hue, var(--muted)); flex: none; }
+  .notelink.folder { border-style: dashed; color: var(--muted); }
+
+  /* ---------- controls ---------- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .chip {
+    font: 500 13px/1 var(--font-ui);
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .12s ease, border-color .12s ease, color .12s ease;
+  }
+
+  .chip:hover { border-color: var(--muted); }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--ground); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hue, var(--muted)); flex: none; }
+  .chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 2px var(--ground); }
+
+  .spacer { flex: 1 1 20px; }
+
+  .toggle {
+    font: 500 13px/1 var(--font-ui);
+    color: var(--muted);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 7px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .toggle:hover { color: var(--ink); }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .toggle[aria-pressed="true"] { color: var(--ink); }
+  .toggle .box { width: 14px; height: 14px; border: 1.5px solid var(--muted); border-radius: 3px; flex: none; position: relative; }
+  .toggle[aria-pressed="true"] .box { background: var(--ink); border-color: var(--ink); }
+
+  .toggle[aria-pressed="true"] .box::after {
+    content: "";
+    position: absolute;
+    left: 3.5px;
+    top: .5px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--ground);
+    border-width: 0 2px 2px 0;
+    transform: rotate(43deg);
+  }
+
+  /* ---------- today panel ---------- */
+  .todaypanel {
+    background: var(--surface);
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .todayhead {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 13px 16px 12px;
+    background: var(--ink);
+    color: var(--ground);
+  }
+
+  .todayhead h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  .todayhead .scope {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    opacity: .72;
+  }
+
+  .todayhead .rule { flex: 1; }
+
+  .todayhead .tally {
+    font-family: var(--font-data);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    opacity: .82;
+  }
+
+  /* ---------- weeks ---------- */
+  .week { display: flex; flex-direction: column; }
+
+  .weekhead {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 6px 2px 10px;
+    position: sticky;
+    top: 0;
+    background: var(--ground);
+    z-index: 3;
+  }
+
+  .weekhead h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0;
+    letter-spacing: -.01em;
+  }
+
+  .weekhead .rng { font-family: var(--font-data); font-size: 12px; color: var(--muted); letter-spacing: .03em; }
+  .weekhead .rule { flex: 1; height: 1px; background: var(--line); }
+  .weekhead .tally { font-family: var(--font-data); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .weekhead.is-now h2 { color: var(--accent); }
+
+  .rows {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .todaypanel .rows { border: 0; border-radius: 0; box-shadow: none; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 34px 96px 1fr auto;
+    align-items: start;
+    gap: 10px;
+    padding: 11px 14px 11px 10px;
+    border-bottom: 1px solid var(--line-soft);
+    position: relative;
+  }
+
+  .row:last-child { border-bottom: 0; }
+
+  .row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--hue, transparent);
+    opacity: .85;
+  }
+
+  .row.done { background: var(--surface-2); }
+  .row.done .ttl { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .row.done::before { opacity: .25; }
+
+  .check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 19px;
+    height: 19px;
+    margin: 1px 0 0 8px;
+    border: 1.5px solid var(--muted);
+    border-radius: 5px;
+    background: var(--surface);
+    cursor: pointer;
+    flex: none;
+    position: relative;
+    transition: background .12s ease, border-color .12s ease;
+  }
+
+  .check:hover { border-color: var(--ink); }
+  .check:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .check:checked { background: var(--good); border-color: var(--good); }
+
+  .check:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--surface);
+    border-width: 0 2px 2px 0;
+    transform: rotate(43deg);
+  }
+
+  .tag {
+    font-family: var(--font-data);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--hue, var(--muted));
+    padding-top: 3px;
+    white-space: nowrap;
+  }
+
+  .body { min-width: 0; }
+  .ttl { font-size: 14.5px; font-weight: 500; color: var(--ink); overflow-wrap: anywhere; cursor: pointer; }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: end;
+    padding-top: 2px;
+    white-space: nowrap;
+  }
+
+  .due { font-family: var(--font-data); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .pill {
+    font-family: var(--font-data);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid currentColor;
+  }
+
+  .pill.late { color: var(--crit); }
+  .pill.soon { color: var(--warn); }
+  .pill.big { color: var(--ink); background: var(--accent-soft); border-color: transparent; }
+  .pill.prep { color: var(--muted); border-color: var(--line); font-weight: 500; }
+  .pill.mine { color: var(--muted); border-color: var(--line); font-weight: 500; }
+
+  .iconbtn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 5px;
+    height: 23px;
+    min-width: 23px;
+    padding: 0 5px;
+    line-height: 1;
+    font: 500 13px/1 var(--font-ui);
+    cursor: pointer;
+    flex: none;
+  }
+
+  .iconbtn:hover { color: var(--ink); border-color: var(--muted); }
+  .iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .iconbtn.on { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .iconbtn.pin { font-size: 15px; }
+
+  /* ---------- inline editor ---------- */
+  .editor {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 4px 2px 10px;
+  }
+
+  .editor input[type="text"], .editor input[type="date"], .editor input[type="time"] {
+    font: 400 14px/1.2 var(--font-ui);
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 8px 10px;
+  }
+
+  .editor input[type="text"] { flex: 1 1 260px; min-width: 0; }
+  .editor input[type="date"], .editor input[type="time"] { font-family: var(--font-data); font-size: 13px; }
+  .editor input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .minibtn {
+    font: 600 13px/1 var(--font-ui);
+    border-radius: 7px;
+    padding: 9px 13px;
+    cursor: pointer;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--surface);
+  }
+
+  .minibtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .minibtn.ghost { background: none; color: var(--muted); border-color: var(--line); }
+  .minibtn.ghost:hover { color: var(--ink); border-color: var(--muted); }
+  .minibtn.danger { background: none; color: var(--crit); border-color: var(--crit); }
+  .minibtn.danger:hover { background: var(--crit); color: var(--surface); }
+
+  /* ---------- add ---------- */
+  .adder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .addlbl {
+    font-family: var(--font-data);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-right: 2px;
+  }
+
+  .adder input[type="text"], .adder input[type="date"], .adder select {
+    font: 400 14px/1.2 var(--font-ui);
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 9px 10px;
+  }
+
+  .adder input[type="text"] { flex: 1 1 240px; min-width: 0; }
+  .adder input[type="date"] { font-family: var(--font-data); font-size: 13px; }
+  .adder input:focus-visible, .adder select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .addtoday { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .addtoday input { accent-color: var(--accent); }
+
+  .btn {
+    font: 600 14px/1 var(--font-ui);
+    color: var(--surface);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 7px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+
+  .btn:hover { background: var(--ink-2); border-color: var(--ink-2); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .empty { padding: 20px 16px; text-align: center; color: var(--muted); font-size: 13.5px; }
+
+  .foot {
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+
+  .foot .sync { font-family: var(--font-data); font-size: 11.5px; letter-spacing: .04em; }
+
+  @media (max-width: 620px) {
+    .row { grid-template-columns: 30px 1fr; row-gap: 4px; padding-left: 8px; }
+    .tag { grid-column: 2; padding-top: 0; }
+    .body { grid-column: 2; }
+    .meta { grid-column: 2; justify-self: start; flex-wrap: wrap; white-space: normal; }
+    .editor { padding-left: 8px; }
+    .nextup { text-align: left; }
+    .weekhead { position: static; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <p class="dateline" id="dateline">Fall 2026</p>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="nextup" id="nextup"></div>
+  </header>
+
+  <section class="buckets" id="buckets" aria-label="Progress by area"></section>
+
+  <nav class="notes" aria-label="Class notes in Google Drive">
+    <span class="noteslbl">Notes</span>
+    <a class="notelink" style="--hue: var(--c-fin400)" target="_blank" rel="noopener" href="https://docs.google.com/document/d/14EdO0dU0boeOuQW0IRfStdD4iMcFjKMNifaVNXxpZUY/edit"><span class="dot"></span>FIN 400</a>
+    <a class="notelink" style="--hue: var(--c-fin453)" target="_blank" rel="noopener" href="https://docs.google.com/document/d/1Xxf-ZxrLDOVLLESQpxD0CVKJ-aEedL7TWFQu5PpPWao/edit"><span class="dot"></span>FIN 453</a>
+    <a class="notelink" style="--hue: var(--c-stat121)" target="_blank" rel="noopener" href="https://docs.google.com/document/d/18wn9iWiXLMZQ2ik8rmDZU0jKunwzf7FfsQdHsjvwRJw/edit"><span class="dot"></span>STAT 121</a>
+    <a class="notelink" style="--hue: var(--c-is111)" target="_blank" rel="noopener" href="https://docs.google.com/document/d/14dJH4U22dctY9gS1-_thJIqjtw7KOKSghXD2w13Wve8/edit"><span class="dot"></span>IS 111</a>
+    <a class="notelink" style="--hue: var(--c-fin326)" target="_blank" rel="noopener" href="https://docs.google.com/document/d/1Z4onEWR3XyRClBsawkinRvWDLW9mrq-YlBMSTci7Js0/edit"><span class="dot"></span>FIN 326</a>
+    <span class="spacer"></span>
+    <a class="notelink folder" target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/1wSPCsSLPwRi-vR3cR5jUSO9AaJ4gDuyt">All notes in Drive</a>
+  </nav>
+
+  <div class="controls" id="controls" role="group" aria-label="Filters"></div>
+
+  <form class="adder" id="adder">
+    <span class="addlbl">Add a task</span>
+    <input type="text" id="newtitle" placeholder="What do you need to do?" aria-label="Task" maxlength="160" required>
+    <select id="newbucket" aria-label="Area">
+      <option value="classes">School</option>
+      <option value="job">Work</option>
+      <option value="life">Personal</option>
+      <option value="club">AI in Finance</option>
+    </select>
+    <input type="date" id="newdue" aria-label="Due date">
+    <label class="addtoday"><input type="checkbox" id="newtoday"> Today</label>
+    <button class="btn" type="submit">Add</button>
+  </form>
+
+  <section class="todaypanel" id="todaypanel" aria-label="Today"></section>
+
+
+  <main id="list"></main>
+
+  <footer class="foot">
+    <span>Learning Suite and Canvas pulled Sep 2, 2026. Work and club items from Gmail, same day. FIN 326 had nothing posted.</span>
+    <span class="sync" id="sync">Saved in this browser</span>
+    <span class="sync" id="build">Build 2026-09-03d (github)</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var COURSES = {
+    fin400:  { label: "FIN 400",  hue: "var(--c-fin400)",  bucket: "classes" },
+    fin453:  { label: "FIN 453",  hue: "var(--c-fin453)",  bucket: "classes" },
+    stat121: { label: "STAT 121", hue: "var(--c-stat121)", bucket: "classes" },
+    is111:   { label: "IS 111",   hue: "var(--c-is111)",   bucket: "classes" },
+    fin326:  { label: "FIN 326",  hue: "var(--c-fin326)",  bucket: "classes" },
+    byu:     { label: "BYU",      hue: "var(--c-byu)",     bucket: "classes" },
+    club:    { label: "CLUB",     hue: "var(--c-club)",    bucket: "club" },
+    job:     { label: "WORK",     hue: "var(--c-job)",     bucket: "job" },
+    life:    { label: "PERSONAL", hue: "var(--c-life)",    bucket: "life" }
+  };
+
+  var BUCKETS = [
+    { key: "classes", name: "School",        hue: "var(--c-fin400)" },
+    { key: "job",     name: "Work",          hue: "var(--c-job)" },
+    { key: "life",    name: "Personal",      hue: "var(--c-life)" },
+    { key: "club",    name: "AI in Finance", hue: "var(--c-club)" }
+  ];
+
+  var ITEMS = [
+    // ---- BYU
+    { id: "adddrop", c: "byu", t: "Add/drop deadline", due: "2026-09-10 17:00", big: true },
+
+    // ---- FIN 400 (top priority)
+    { id: "f4-py3",  c: "fin400", t: "Finish Python Module 3", due: "2026-09-02 23:55", prep: true },
+    { id: "f4-r1",   c: "fin400", t: "Reading: syllabus, O'Reilly Ch 2, Aiello pp. v-xi", due: "2026-09-03 12:30", prep: true },
+    { id: "f4-ta1",  c: "fin400", t: "Go to the FIN 400 TA lab", n: "Wednesdays: Jarem Miller 11am to 12:30pm in TNRB 2240, Abe Barlow 3:30 to 5pm in TNRB 1216", due: "2026-09-02 17:00" },
+    { id: "f4-rec",  c: "fin400", t: "Class Recording Release Form", due: "2026-09-04 23:59" },
+    { id: "f4-hw1",  c: "fin400", t: "Homework 1", due: "2026-09-07 23:55" },
+    { id: "f4-r2",   c: "fin400", t: "Reading: O'Reilly Ch 3, Aiello 1.1-1.3", due: "2026-09-08 12:30", prep: true },
+    { id: "f4-py4",  c: "fin400", t: "Finish Python Module 4", due: "2026-09-11 23:55", prep: true },
+    { id: "f4-hw2",  c: "fin400", t: "Homework 2", due: "2026-09-14 23:55" },
+    { id: "f4-r3",   c: "fin400", t: "Reading: Aiello 1.4-1.6", due: "2026-09-15 12:30", prep: true },
+    { id: "f4-hw3",  c: "fin400", t: "Homework 3", due: "2026-09-16 23:55" },
+    { id: "f4-r4",   c: "fin400", t: "Reading: Aiello Ch 2", due: "2026-09-17 12:30", prep: true },
+    { id: "f4-py5",  c: "fin400", t: "Finish Python Module 5", due: "2026-09-18 23:55", prep: true },
+    { id: "f4-hw4",  c: "fin400", t: "Homework 4", due: "2026-09-21 23:55" },
+    { id: "f4-r5",   c: "fin400", t: "Reading: Aiello 3.1-3.2", due: "2026-09-22 12:30", prep: true },
+    { id: "f4-hw5",  c: "fin400", t: "Homework 5", due: "2026-09-23 23:55" },
+    { id: "f4-r6",   c: "fin400", t: "Reading: Aiello 3.3", due: "2026-09-24 12:30", prep: true },
+    { id: "f4-py6",  c: "fin400", t: "Finish Python Module 6", due: "2026-09-25 23:55", prep: true },
+    { id: "f4-hw55", c: "fin400", t: "Homework 5.5", due: "2026-09-25 23:55" },
+    { id: "f4-hw6",  c: "fin400", t: "Homework 6", due: "2026-09-28 23:55" },
+    { id: "f4-r7",   c: "fin400", t: "Reading: Aiello 3.4-3.5", due: "2026-09-29 12:30", prep: true },
+    { id: "f4-hw7",  c: "fin400", t: "Homework 7", due: "2026-09-30 23:55" },
+    { id: "f4-r8",   c: "fin400", t: "Reading: Aiello 4.1-4.3", due: "2026-10-01 12:30", prep: true },
+    { id: "f4-prop", c: "fin400", t: "Research Project group proposal", due: "2026-10-02 23:55", big: true },
+    { id: "f4-hw8",  c: "fin400", t: "Homework 8", due: "2026-10-05 23:55" },
+    { id: "f4-r9",   c: "fin400", t: "Reading: Aiello 4.4-4.6", due: "2026-10-06 12:30", prep: true },
+    { id: "f4-ex1",  c: "fin400", t: "Exam 1", due: "2026-10-08 14:00", big: true },
+    { id: "f4-ex1p", c: "fin400", t: "Exam 1 Python Day", due: "2026-10-09 12:30", big: true },
+    { id: "f4-r10",  c: "fin400", t: "Reading for Lecture 10: Returns", due: "2026-10-13 12:30", prep: true },
+    { id: "f4-hw9",  c: "fin400", t: "Homework 9", due: "2026-10-19 23:55" },
+    { id: "f4-r11",  c: "fin400", t: "Reading for Lecture 11: Portfolios", due: "2026-10-20 12:30", prep: true },
+    { id: "f4-hw10", c: "fin400", t: "Homework 10", due: "2026-10-21 23:55" },
+    { id: "f4-r12",  c: "fin400", t: "Reading for Lecture 12: Risk and Return I", due: "2026-10-22 12:30", prep: true },
+    { id: "f4-pr1",  c: "fin400", t: "Research Project One", due: "2026-10-23 23:59", big: true },
+    { id: "f4-hw11", c: "fin400", t: "Homework 11", due: "2026-10-26 23:55" },
+    { id: "f4-r13",  c: "fin400", t: "Reading for Lecture 13: Risk and Return II", due: "2026-10-27 12:30", prep: true },
+    { id: "f4-hw12", c: "fin400", t: "Homework 12", due: "2026-10-28 23:55" },
+    { id: "f4-r14",  c: "fin400", t: "Reading for Lecture 14: Risk and Return Space", due: "2026-10-29 12:30", prep: true },
+
+    // ---- FIN 453
+    { id: "f5-i1",  c: "fin453", t: "Indicator: U4Rate", due: "2026-09-10 09:30" },
+    { id: "f5-q1",  c: "fin453", t: "Ch. 1 reading quiz", due: "2026-09-14 23:59" },
+    { id: "f5-i2",  c: "fin453", t: "Indicator: Smoothed US Recession Probabilities", due: "2026-09-15 09:30" },
+    { id: "f5-q2",  c: "fin453", t: "Ch. 2 reading quiz", due: "2026-09-21 23:59" },
+    { id: "f5-i3",  c: "fin453", t: "Indicator: Housing Starts", due: "2026-09-22 09:30" },
+    { id: "f5-q3",  c: "fin453", t: "Ch. 3 reading quiz", due: "2026-09-28 23:59" },
+    { id: "f5-i4",  c: "fin453", t: "Indicator: Core PCEPI, change from previous year", due: "2026-09-29 09:30" },
+    { id: "f5-q6",  c: "fin453", t: "Ch. 6 reading quiz", due: "2026-10-05 23:59" },
+    { id: "f5-i5",  c: "fin453", t: "Indicator: Real-Time Sahm Rule", due: "2026-10-06 09:30" },
+    { id: "f5-q7",  c: "fin453", t: "Ch. 7 reading quiz", due: "2026-10-12 23:59" },
+    { id: "f5-cit", c: "fin453", t: "Citizenship", due: "2026-10-12 23:59" },
+    { id: "f5-i6",  c: "fin453", t: "Indicator: Household Debt Service Payments", due: "2026-10-13 09:30" },
+    { id: "f5-q11", c: "fin453", t: "Ch. 11 reading quiz", due: "2026-10-19 23:59" },
+    { id: "f5-i7",  c: "fin453", t: "Indicator: U. Michigan Consumer Sentiment", due: "2026-10-20 09:30" },
+    { id: "f5-mid", c: "fin453", t: "Midterm, Testing Center", n: "Window opens Oct 22 at 8am", due: "2026-10-27 21:00", big: true },
+
+    // ---- STAT 121
+    { id: "s1-pp11", c: "stat121", t: "PP 1.1 closes", due: "2026-09-08 20:00", prep: true },
+    { id: "s1-pol",  c: "stat121", t: "Course Policy Quiz", due: "2026-09-10 23:59" },
+    { id: "s1-sur",  c: "stat121", t: "Course Survey", due: "2026-09-10 23:59" },
+    { id: "s1-hw0",  c: "stat121", t: "Homework 0, Statistics Foundations", n: "Versions A, B and C", due: "2026-09-10 23:59" },
+    { id: "s1-h11",  c: "stat121", t: "Homework 1.1, Sampling", n: "Versions A, B and C", due: "2026-09-10 23:59" },
+    { id: "s1-pp12", c: "stat121", t: "PP 1.2 closes", due: "2026-09-10 20:00", prep: true },
+    { id: "s1-pp13", c: "stat121", t: "PP 1.3 closes", due: "2026-09-15 20:00", prep: true },
+    { id: "s1-h12",  c: "stat121", t: "Homework 1.2, Experiments", n: "Versions A, B and C", due: "2026-09-15 23:59" },
+    { id: "s1-ica1", c: "stat121", t: "In-Class Analysis, Unit 1", due: "2026-09-15 23:59" },
+    { id: "s1-h13",  c: "stat121", t: "Homework 1.3", n: "AI admittance, AI advertising, AI resume screening", due: "2026-09-17 23:59" },
+    { id: "s1-mp1",  c: "stat121", t: "Mini-Project 1, Data Collection", due: "2026-09-17 23:59", big: true },
+    { id: "s1-pp21", c: "stat121", t: "PP 2.1 closes", due: "2026-09-22 20:00", prep: true },
+    { id: "s1-h21",  c: "stat121", t: "Homework 2.1 and 2.2", n: "401(k), cereal nutrition, sunshine duration", due: "2026-09-24 23:59" },
+    { id: "s1-pp23", c: "stat121", t: "PP 2.3 closes", due: "2026-09-29 20:00", prep: true },
+    { id: "s1-h23",  c: "stat121", t: "Homework 2.3 and 2.4", due: "2026-10-01 23:59" },
+    { id: "s1-pp31", c: "stat121", t: "PP 3.1 closes", due: "2026-10-06 20:00", prep: true },
+    { id: "s1-h25",  c: "stat121", t: "Homework 2.5", due: "2026-10-06 23:59" },
+    { id: "s1-ica2", c: "stat121", t: "In-Class Analysis, Unit 2", due: "2026-10-06 23:59" },
+    { id: "s1-h31",  c: "stat121", t: "Homework 3.1", due: "2026-10-08 23:59" },
+    { id: "s1-mp2",  c: "stat121", t: "Mini-Project 2, Bone Loss in Nursing Mothers", due: "2026-10-08 23:59", big: true },
+    { id: "s1-pp33", c: "stat121", t: "PP 3.3 closes", due: "2026-10-13 20:00", prep: true },
+    { id: "s1-h32",  c: "stat121", t: "Homework 3.2", due: "2026-10-13 23:59" },
+    { id: "s1-ica3", c: "stat121", t: "In-Class Analysis, Unit 3", due: "2026-10-13 23:59" },
+    { id: "s1-h33",  c: "stat121", t: "Homework 3.3", due: "2026-10-15 23:59" },
+    { id: "s1-mp3",  c: "stat121", t: "Mini-Project 3, Delta Flight Delays", due: "2026-10-15 23:59", big: true },
+    { id: "s1-e1a",  c: "stat121", t: "Exam 1, Airbnb and Telco", n: "Opens Oct 19", due: "2026-10-20 23:59", big: true },
+    { id: "s1-pp42", c: "stat121", t: "PP 4.2 closes", due: "2026-10-22 20:00", prep: true },
+    { id: "s1-e1b",  c: "stat121", t: "Exam 1, Covid Cases and Billionaires", n: "Opens Oct 21", due: "2026-10-22 23:59", big: true },
+    { id: "s1-ica4", c: "stat121", t: "In-Class Analysis, Unit 4", due: "2026-10-22 23:59" },
+    { id: "s1-h41",  c: "stat121", t: "Homework 4.1", due: "2026-10-23 23:59" },
+    { id: "s1-h42",  c: "stat121", t: "Homework 4.2", due: "2026-10-27 23:59" },
+    { id: "s1-mp4",  c: "stat121", t: "Mini-Project 4, Emergency Department Wait Times", due: "2026-10-27 23:59", big: true },
+    { id: "s1-pp52", c: "stat121", t: "PP 5.2 closes", due: "2026-10-29 20:00", prep: true },
+    { id: "s1-h51",  c: "stat121", t: "Homework 5.1", due: "2026-10-29 23:59" },
+
+    // ---- IS 111
+    { id: "i1-s1a", c: "is111", t: "Session 1: EYARC, how to use the platform", due: "2026-09-05 23:59" },
+    { id: "i1-s1b", c: "is111", t: "Session 1: EYARC, Rewiring introduction chapter", due: "2026-09-05 23:59" },
+    { id: "i1-s1q", c: "is111", t: "Session 1 Quiz", due: "2026-09-12 23:59" },
+    { id: "i1-s2",  c: "is111", t: "Session 2: Intro to GenAI, Becoming with GenAI, Rewiring Ch 1", due: "2026-09-12 23:59" },
+    { id: "i1-s3",  c: "is111", t: "Session 3: Prompt engineering, soft skills presentations, Rewiring Ch 2", due: "2026-09-19 23:59" },
+    { id: "i1-s4",  c: "is111", t: "Session 4: Prompt engineering 2, soft skills feedback, Rewiring Ch 3", due: "2026-09-26 23:59" },
+    { id: "i1-s5",  c: "is111", t: "Session 5: AI ethics, Verifactum", due: "2026-10-03 23:59" },
+    { id: "i1-s6",  c: "is111", t: "Session 6: Rewiring Ch 4 and 5, multimodal PowerPoint", due: "2026-10-10 23:59" },
+    { id: "i1-s7",  c: "is111", t: "Session 7: Advanced GenAI, Rewiring Ch 6, lifelong learning discussion", due: "2026-10-17 23:59" },
+    { id: "i1-s8",  c: "is111", t: "Session 8: Rewiring Ch 7, agentic AI", due: "2026-10-24 23:59" },
+    { id: "i1-s9",  c: "is111", t: "Session 9: Vibe coding, vibe coding a game, Rewiring Ch 8", due: "2026-10-31 23:59" },
+    { id: "i1-s10", c: "is111", t: "Session 10: Agentic workflows, Rewiring Ch 9, MindStudio agent", due: "2026-11-07 23:59" },
+    { id: "i1-s11", c: "is111", t: "Session 11: Rewiring Ch 10", due: "2026-11-14 23:59" },
+    { id: "i1-s12", c: "is111", t: "Session 12: Rewiring Ch 11, challenges with GenAI discussion", due: "2026-11-21 23:59" },
+    { id: "i1-s13", c: "is111", t: "Session 13: Rewiring Ch 12", due: "2026-12-05 23:59" },
+    { id: "i1-s14", c: "is111", t: "Session 14: Using GenAI to come closer to Jesus Christ", n: "Canvas shows a stale April 2025 date, the module says Dec 10", due: "2026-12-10 23:59" },
+    { id: "i1-fin", c: "is111", t: "Final Project", n: "500 points, worth more than the rest of the class combined", due: "2026-12-17 23:59", big: true },
+    { id: "i1-ec",  c: "is111", t: "Extra credit: Lab Studies", n: "Optional, no due date", due: "" },
+
+    // ---- FIN 326
+    { id: "f3-live", c: "fin326", t: "Check whether FIN 326 has published a course site", n: "Unpublished on Learning Suite and Canvas as of Sep 2", due: "2026-09-08 09:00" },
+
+    // ---- AI in Finance club
+    { id: "cl-logo", c: "club", t: "Design the club logo", n: "Soft deadline", due: "2026-09-04 18:00", big: true },
+    { id: "cl-who",  c: "club", t: "Confirm the real deadline and who signs off on the logo", due: "2026-09-03 18:00" },
+    { id: "cl-rule", c: "club", t: "Check BYU and Marriott branding rules on colors, fonts and use of the BYU name", due: "2026-09-03 18:00" },
+    { id: "cl-sk",   c: "club", t: "Sketch 3 to 4 logo directions", due: "2026-09-04 12:00" },
+    { id: "cl-fin",  c: "club", t: "Produce final files: full color, one color, and a square version", due: "2026-09-04 18:00" },
+    { id: "cl-meet1", c: "club", t: "AI in Finance group meeting on Google Meet", n: "Invite from Owen Burton, 1:30 to 2pm", due: "2026-09-02 13:30" },
+
+    // ---- Peterson Partners (from email, Sep 2)
+    { id: "pp-day1",  c: "job", t: "First day at Peterson Partners", n: "Arrive between 9 and 9:30am. Hayden wrote \u201cnext Wednesday\u201d on Sep 1, so confirm the date with him", due: "2026-09-09 09:00", big: true },
+    { id: "pp-hours", c: "job", t: "Office hours you committed to: Mon 8 to 4, Wed 8 to 4, Fri 8 to 12", n: "20 hours a week, from your reply to Hayden on Sep 1", due: "" },
+    { id: "pp-prep",  c: "job", t: "Keep working through the Claude Code and Snowflake folders", n: "Self-paced, nothing due", due: "" }
+  ];
+
+  // Items Claude pins to Today when Emily says what she is working on.
+  // Keyed by the day it was pinned; an unfinished pin rolls forward.
+  var CLAUDE_PINS = {
+    "f4-r1": "2026-09-02",
+    "f4-ta1": "2026-09-02",
+    "cl-meet1": "2026-09-02"
+  };
+
+  // Things Claude puts on Today when Emily says what she is working on.
+  // Keyed by the day it was pinned; an unfinished pin rolls forward.
+  var CLAUDE_PINS = {
+    "f4-r1": "2026-09-02",
+    "f4-ta1": "2026-09-02",
+    "cl-meet1": "2026-09-02"
+  };
+
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  function parseDue(s) {
+    if (!s) return null;
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?$/.exec(s);
+    if (!m) return null;
+    return new Date(+m[1], +m[2] - 1, +m[3], m[4] ? +m[4] : 23, m[5] ? +m[5] : 59, 0, 0);
+  }
+
+  function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+  function mondayOf(d) {
+    var x = startOfDay(d);
+    x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+    return x;
+  }
+
+  function dateKey(d) {
+    var m = d.getMonth() + 1, dd = d.getDate();
+    return d.getFullYear() + "-" + (m < 10 ? "0" + m : m) + "-" + (dd < 10 ? "0" + dd : dd);
+  }
+
+  function fmtDay(d) { return DAYS[d.getDay()] + " " + MONTHS[d.getMonth()] + " " + d.getDate(); }
+
+  function fmtTime(d) {
+    var h = d.getHours(), mm = d.getMinutes();
+    var ap = h >= 12 ? "pm" : "am";
+    var hr = h % 12 === 0 ? 12 : h % 12;
+    return hr + (mm ? ":" + (mm < 10 ? "0" + mm : mm) : "") + ap;
+  }
+
+  function daysBetween(a, b) { return Math.round((startOfDay(b) - startOfDay(a)) / 86400000); }
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+  // ---------- state ----------
+  var checked = Object.create(null);
+  var pins = Object.create(null);
+  var edits = Object.create(null);
+  var custom = [];
+  var filter = "all";
+  var hideDone = false;
+  var showPrep = false;
+  var editing = null;
+  var pendingLocal = false;
+  var db = null;
+  var LS = "semester-board-v1";
+
+  function snapshotState() {
+    return { checked: checked, custom: custom, pins: pins, edits: edits };
+  }
+
+  function readLocal() {
+    try {
+      var raw = window.localStorage.getItem(LS);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (!o) return;
+      if (o.checked) checked = o.checked;
+      if (Array.isArray(o.custom)) custom = o.custom;
+      if (o.pins) pins = o.pins;
+      if (o.edits) edits = o.edits;
+    } catch (e) { /* private window or blocked storage */ }
+  }
+
+  function writeLocal() {
+    try { window.localStorage.setItem(LS, JSON.stringify(snapshotState())); } catch (e) { /* fine */ }
+  }
+
+  function persist() {
+    writeLocal();
+    pendingLocal = true;
+    if (!db) { setSync("Saved on this device"); return; }
+    var body = snapshotState();
+    body.savedAt = new Date().toISOString();
+    setSync("Saving\u2026");
+    db.doc("state/board").set(body).then(function () {
+      pendingLocal = false;
+      setSync("Saved " + fmtTime(new Date()));
+    }).catch(function () {
+      pendingLocal = false;
+      setSync("Saved on this device only");
+    });
+  }
+
+  function setSync(msg) {
+    var el = document.getElementById("sync");
+    if (el) el.textContent = msg;
+  }
+
+  // ---------- item assembly ----------
+  function allItems() {
+    var out = [];
+    ITEMS.forEach(function (base) {
+      var e = edits[base.id];
+      if (e && e.del) return;
+      if (!e) { out.push(base); return; }
+      var merged = {};
+      for (var k in base) if (Object.prototype.hasOwnProperty.call(base, k)) merged[k] = base[k];
+      if (typeof e.t === "string") merged.t = e.t;
+      if (typeof e.n === "string") merged.n = e.n;
+      if (typeof e.due === "string") merged.due = e.due;
+      merged.edited = true;
+      out.push(merged);
+    });
+    custom.forEach(function (c) {
+      out.push({
+        id: c.id,
+        c: c.bucket === "classes" ? "byu" : c.bucket,
+        bucketOverride: c.bucket,
+        t: c.title,
+        n: c.note || "",
+        due: c.due || "",
+        mine: true
+      });
+    });
+    return out;
+  }
+
+  function bucketOf(it) {
+    return it.bucketOverride || (COURSES[it.c] ? COURSES[it.c].bucket : "life");
+  }
+
+  function inFilter(it) {
+    if (filter === "all") return true;
+    if (filter === "classes" || filter === "job" || filter === "club" || filter === "life") {
+      return bucketOf(it) === filter;
+    }
+    return it.c === filter;
+  }
+
+  function visible(it) {
+    if (!inFilter(it)) return false;
+    if (!showPrep && it.prep) return false;
+    if (hideDone && checked[it.id]) return false;
+    return true;
+  }
+
+  function pinnedOn(it) {
+    var p = Object.prototype.hasOwnProperty.call(pins, it.id) ? pins[it.id] : CLAUDE_PINS[it.id];
+    return (!p || p === "off") ? null : p;
+  }
+
+  function isToday(it, today, now) {
+    var p = pinnedOn(it);
+    if (p && p <= today && (!checked[it.id] || p === today)) return true;
+    if (!it.due) return false;
+    var d = parseDue(it.due);
+    if (dateKey(d) === today) return true;
+    return d < now && !checked[it.id];
+  }
+
+  function togglePin(it, today) {
+    if (pinnedOn(it)) {
+      if (CLAUDE_PINS[it.id]) pins[it.id] = "off"; else delete pins[it.id];
+    } else {
+      pins[it.id] = today;
+    }
+    persist();
+    render();
+  }
+
+  function toggleCheck(it, on) {
+    if (on) checked[it.id] = true; else delete checked[it.id];
+    persist();
+    render();
+  }
+
+  function saveEdit(it, title, due) {
+    if (it.mine) {
+      for (var i = 0; i < custom.length; i++) {
+        if (custom[i].id === it.id) {
+          custom[i].title = title;
+          custom[i].due = due;
+        }
+      }
+    } else {
+      var e = edits[it.id] || (edits[it.id] = {});
+      e.t = title;
+      e.due = due;
+    }
+    editing = null;
+    persist();
+    render();
+  }
+
+  function removeItem(it) {
+    if (it.mine) {
+      custom = custom.filter(function (c) { return c.id !== it.id; });
+    } else {
+      edits[it.id] = { del: true };
+    }
+    delete checked[it.id];
+    delete pins[it.id];
+    editing = null;
+    persist();
+    render();
+  }
+
+  // ---------- render ----------
+  function renderMasthead(now) {
+    document.getElementById("dateline").textContent =
+      DAYS[now.getDay()] + ", " + MONTHS[now.getMonth()] + " " + now.getDate() + ", " + now.getFullYear();
+
+    var pending = allItems().filter(function (it) {
+      return !checked[it.id] && it.due && !it.prep;
+    }).sort(function (a, b) { return parseDue(a.due) - parseDue(b.due); });
+
+    var box = document.getElementById("nextup");
+    if (!pending.length) {
+      box.innerHTML = '<span class="lbl">Next up</span><span class="thing">Nothing outstanding</span>';
+      return;
+    }
+    var n = pending[0];
+    var d = parseDue(n.due);
+    var diff = daysBetween(now, d);
+    var late = Math.abs(diff);
+    var when = diff < 0 ? (late === 1 ? "1 day late" : late + " days late")
+      : diff === 0 ? "today at " + fmtTime(d)
+      : diff === 1 ? "tomorrow at " + fmtTime(d)
+      : "in " + diff + " days";
+    var course = COURSES[n.c] ? COURSES[n.c].label : "";
+    box.innerHTML = '<span class="lbl">Next up</span>'
+      + '<div class="thing">' + esc(course ? course + ": " + n.t : n.t) + '</div>'
+      + '<div class="when">' + esc(when) + '</div>';
+  }
+
+  function renderBuckets() {
+    var items = allItems();
+    var host = document.getElementById("buckets");
+    host.innerHTML = "";
+    BUCKETS.forEach(function (b) {
+      var mine = items.filter(function (it) { return bucketOf(it) === b.key && !it.prep; });
+      var done = mine.filter(function (it) { return checked[it.id]; }).length;
+      var pct = mine.length ? Math.round(done / mine.length * 100) : 0;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "bcard";
+      btn.setAttribute("aria-pressed", filter === b.key ? "true" : "false");
+      btn.style.setProperty("--bar", b.hue);
+      btn.innerHTML = '<span class="bname"><span class="dot"></span>' + esc(b.name) + '</span>'
+        + '<span class="bcount">' + done + ' <span>of ' + mine.length + '</span></span>'
+        + '<span class="track"><i style="width:' + pct + '%"></i></span>'
+        + '<span class="bsub">' + (mine.length ? pct + "% done" : "nothing here yet") + '</span>';
+      btn.addEventListener("click", function () {
+        filter = filter === b.key ? "all" : b.key;
+        editing = null;
+        render();
+      });
+      host.appendChild(btn);
+    });
+  }
+
+  function renderControls() {
+    var host = document.getElementById("controls");
+    host.innerHTML = "";
+
+    var opts = [{ key: "all", label: "Everything", hue: "var(--muted)" }];
+    ["fin400", "fin453", "stat121", "is111", "fin326"].forEach(function (k) {
+      opts.push({ key: k, label: COURSES[k].label, hue: COURSES[k].hue });
+    });
+    opts.push({ key: "job", label: "Work", hue: "var(--c-job)" });
+    opts.push({ key: "life", label: "Personal", hue: "var(--c-life)" });
+    opts.push({ key: "club", label: "AI in Finance", hue: "var(--c-club)" });
+
+    opts.forEach(function (o) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.setAttribute("aria-pressed", filter === o.key ? "true" : "false");
+      b.style.setProperty("--hue", o.hue);
+      b.innerHTML = (o.key === "all" ? "" : '<span class="dot"></span>') + esc(o.label);
+      b.addEventListener("click", function () { filter = o.key; editing = null; render(); });
+      host.appendChild(b);
+    });
+
+    var sp = document.createElement("span");
+    sp.className = "spacer";
+    host.appendChild(sp);
+
+    var sel = document.getElementById("newbucket");
+    if (sel && !sel.dataset.touched) {
+      var b = filter === "all" ? "life"
+        : (COURSES[filter] ? COURSES[filter].bucket : filter);
+      sel.value = b;
+    }
+
+    host.appendChild(mkToggle("Show prep and reading", showPrep, function (v) { showPrep = v; render(); }));
+    host.appendChild(mkToggle("Hide finished", hideDone, function (v) { hideDone = v; render(); }));
+  }
+
+  function mkToggle(label, on, cb) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "toggle";
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.innerHTML = '<span class="box"></span>' + esc(label);
+    b.addEventListener("click", function () { cb(!on); });
+    return b;
+  }
+
+  function scopeName() {
+    if (filter === "all") return "everything";
+    var b = BUCKETS.filter(function (x) { return x.key === filter; })[0];
+    if (b) return b.name;
+    return COURSES[filter] ? COURSES[filter].label : filter;
+  }
+
+  function renderToday(now) {
+    var today = dateKey(now);
+    var host = document.getElementById("todaypanel");
+    host.innerHTML = "";
+
+    var mine = allItems().filter(function (it) {
+      return inFilter(it) && isToday(it, today, now);
+    });
+
+    mine.sort(function (a, b) {
+      var ac = checked[a.id] ? 1 : 0, bc = checked[b.id] ? 1 : 0;
+      if (ac !== bc) return ac - bc;
+      if (a.due && b.due) return parseDue(a.due) - parseDue(b.due);
+      return a.due ? -1 : 1;
+    });
+
+    var done = mine.filter(function (it) { return checked[it.id]; }).length;
+
+    var head = document.createElement("div");
+    head.className = "todayhead";
+    head.innerHTML = '<h2>Today</h2>'
+      + '<span class="scope">' + esc(scopeName()) + '</span>'
+      + '<span class="rule"></span>'
+      + '<span class="tally">' + done + "/" + mine.length + '</span>';
+    host.appendChild(head);
+
+    if (!mine.length) {
+      var p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = "Nothing on today's list. Press + on anything below to put it here.";
+      host.appendChild(p);
+      return;
+    }
+
+    var rows = document.createElement("div");
+    rows.className = "rows";
+    mine.forEach(function (it) { rows.appendChild(mkRow(it, now, true)); });
+    host.appendChild(rows);
+  }
+
+  function renderList(now) {
+    var host = document.getElementById("list");
+    host.innerHTML = "";
+
+    var items = allItems().filter(visible);
+    if (!items.length) {
+      var e = document.createElement("div");
+      e.className = "rows";
+      e.innerHTML = '<p class="empty">Nothing here. Try a different filter, or add something below.</p>';
+      host.appendChild(e);
+      return;
+    }
+
+    var dated = items.filter(function (it) { return it.due; });
+    var undated = items.filter(function (it) { return !it.due; });
+
+    dated.sort(function (a, b) {
+      var d = parseDue(a.due) - parseDue(b.due);
+      return d !== 0 ? d : (a.t < b.t ? -1 : 1);
+    });
+
+    var groups = [];
+    var index = Object.create(null);
+    dated.forEach(function (it) {
+      var key = mondayOf(parseDue(it.due)).getTime();
+      if (!index[key]) {
+        index[key] = { start: mondayOf(parseDue(it.due)), items: [] };
+        groups.push(index[key]);
+      }
+      index[key].items.push(it);
+    });
+
+    var thisWeek = mondayOf(now).getTime();
+
+    groups.forEach(function (g) {
+      var sec = document.createElement("section");
+      sec.className = "week";
+
+      var end = new Date(g.start);
+      end.setDate(end.getDate() + 6);
+      var isNow = g.start.getTime() === thisWeek;
+      var doneCount = g.items.filter(function (it) { return checked[it.id]; }).length;
+
+      var head = document.createElement("div");
+      head.className = "weekhead" + (isNow ? " is-now" : "");
+      head.innerHTML = '<h2>' + (isNow ? "This week" : "Week of " + MONTHS[g.start.getMonth()] + " " + g.start.getDate()) + '</h2>'
+        + '<span class="rng">' + MONTHS[g.start.getMonth()] + " " + g.start.getDate() + " to " + MONTHS[end.getMonth()] + " " + end.getDate() + '</span>'
+        + '<span class="rule"></span>'
+        + '<span class="tally">' + doneCount + "/" + g.items.length + '</span>';
+      sec.appendChild(head);
+
+      var rows = document.createElement("div");
+      rows.className = "rows";
+      g.items.forEach(function (it) { rows.appendChild(mkRow(it, now, false)); });
+      sec.appendChild(rows);
+      host.appendChild(sec);
+    });
+
+    if (undated.length) {
+      var sec2 = document.createElement("section");
+      sec2.className = "week";
+      var dc = undated.filter(function (it) { return checked[it.id]; }).length;
+      var h2 = document.createElement("div");
+      h2.className = "weekhead";
+      h2.innerHTML = '<h2>No date</h2><span class="rng">whenever you get to it</span>'
+        + '<span class="rule"></span><span class="tally">' + dc + "/" + undated.length + '</span>';
+      sec2.appendChild(h2);
+      var r2 = document.createElement("div");
+      r2.className = "rows";
+      undated.forEach(function (it) { r2.appendChild(mkRow(it, now, false)); });
+      sec2.appendChild(r2);
+      host.appendChild(sec2);
+    }
+  }
+
+  function mkRow(it, now, inToday) {
+    var rowKey = (inToday ? "t:" : "w:") + it.id;
+    var row = document.createElement("div");
+    row.className = "row" + (checked[it.id] ? " done" : "");
+    var course = COURSES[it.c];
+    if (course) row.style.setProperty("--hue", course.hue);
+
+    var box = document.createElement("input");
+    box.type = "checkbox";
+    box.className = "check";
+    box.checked = !!checked[it.id];
+    box.id = "chk-" + rowKey;
+    box.addEventListener("change", function () { toggleCheck(it, box.checked); });
+    row.appendChild(box);
+
+    var tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = course ? course.label : "";
+    row.appendChild(tag);
+
+    if (editing === rowKey) {
+      row.appendChild(mkEditor(it, rowKey));
+      return row;
+    }
+
+    var body = document.createElement("div");
+    body.className = "body";
+    var lab = document.createElement("label");
+    lab.className = "ttl";
+    lab.setAttribute("for", box.id);
+    lab.textContent = it.t;
+    body.appendChild(lab);
+    if (it.n) {
+      var note = document.createElement("div");
+      note.className = "note";
+      note.textContent = it.n;
+      body.appendChild(note);
+    }
+    row.appendChild(body);
+
+    var meta = document.createElement("div");
+    meta.className = "meta";
+
+    if (it.prep) meta.appendChild(mkPill("prep", "prep"));
+    if (it.big) meta.appendChild(mkPill("big", "major"));
+    if (it.mine) meta.appendChild(mkPill("mine", "yours"));
+
+    if (it.due) {
+      var d = parseDue(it.due);
+      var diff = daysBetween(now, d);
+      if (!checked[it.id]) {
+        if (d < now) meta.appendChild(mkPill("late", "late"));
+        else if (diff <= 2) meta.appendChild(mkPill("soon", diff === 0 ? "today" : diff === 1 ? "tomorrow" : "2 days"));
+      }
+      var due = document.createElement("span");
+      due.className = "due";
+      due.textContent = fmtDay(d) + " · " + fmtTime(d);
+      meta.appendChild(due);
+    }
+
+    var isPinned = !!pinnedOn(it);
+    var pin = document.createElement("button");
+    pin.type = "button";
+    pin.className = "iconbtn pin" + (isPinned ? " on" : "");
+    pin.setAttribute("aria-pressed", isPinned ? "true" : "false");
+    pin.setAttribute("aria-label", isPinned ? "Take " + it.t + " off today" : "Put " + it.t + " on today");
+    pin.title = isPinned ? "Take off Today" : "Put on Today";
+    pin.textContent = isPinned ? "−" : "+";
+    pin.addEventListener("click", function () { togglePin(it, dateKey(now)); });
+    meta.appendChild(pin);
+
+    var ed = document.createElement("button");
+    ed.type = "button";
+    ed.className = "iconbtn";
+    ed.setAttribute("aria-label", "Edit " + it.t);
+    ed.title = "Edit";
+    ed.textContent = "Edit";
+    ed.addEventListener("click", function () { editing = rowKey; render(); });
+    meta.appendChild(ed);
+
+    row.appendChild(meta);
+    return row;
+  }
+
+  function mkEditor(it, rowKey) {
+    var wrap = document.createElement("div");
+    wrap.className = "editor";
+
+    var title = document.createElement("input");
+    title.type = "text";
+    title.value = it.t;
+    title.maxLength = 200;
+    title.setAttribute("aria-label", "Title");
+
+    var d = it.due ? parseDue(it.due) : null;
+
+    var date = document.createElement("input");
+    date.type = "date";
+    date.value = d ? dateKey(d) : "";
+    date.setAttribute("aria-label", "Due date");
+
+    var time = document.createElement("input");
+    time.type = "time";
+    time.value = d ? pad(d.getHours()) + ":" + pad(d.getMinutes()) : "";
+    time.setAttribute("aria-label", "Due time");
+
+    function commit() {
+      var t = title.value.trim();
+      if (!t) { title.focus(); return; }
+      var due = date.value ? date.value + " " + (time.value || "23:59") : "";
+      saveEdit(it, t, due);
+    }
+
+    var save = document.createElement("button");
+    save.type = "button";
+    save.className = "minibtn";
+    save.textContent = "Save";
+    save.addEventListener("click", commit);
+
+    var cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "minibtn ghost";
+    cancel.textContent = "Cancel";
+    cancel.addEventListener("click", function () { editing = null; render(); });
+
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "minibtn danger";
+    del.textContent = "Delete";
+    del.addEventListener("click", function () { removeItem(it); });
+
+    title.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") { ev.preventDefault(); commit(); }
+      if (ev.key === "Escape") { editing = null; render(); }
+    });
+
+    wrap.appendChild(title);
+    wrap.appendChild(date);
+    wrap.appendChild(time);
+    wrap.appendChild(save);
+    wrap.appendChild(cancel);
+    wrap.appendChild(del);
+
+    setTimeout(function () { title.focus(); title.select(); }, 0);
+    return wrap;
+  }
+
+  function mkPill(cls, text) {
+    var p = document.createElement("span");
+    p.className = "pill " + cls;
+    p.textContent = text;
+    return p;
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
+  function render() {
+    var now = new Date();
+    renderMasthead(now);
+    renderBuckets();
+    renderControls();
+    renderToday(now);
+    renderList(now);
+  }
+
+  // ---------- add ----------
+  document.getElementById("newbucket").addEventListener("change", function (ev) {
+    ev.target.dataset.touched = "1";
+  });
+
+  document.getElementById("adder").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var t = document.getElementById("newtitle");
+    var b = document.getElementById("newbucket");
+    var d = document.getElementById("newdue");
+    var tod = document.getElementById("newtoday");
+    var title = t.value.trim();
+    if (!title) return;
+    var id = "mine-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    custom.push({ id: id, title: title, bucket: b.value, due: d.value ? d.value + " 23:59" : "" });
+    if (tod && tod.checked) pins[id] = dateKey(new Date());
+    t.value = "";
+    d.value = "";
+    persist();
+    render();
+    t.focus();
+  });
+
+  // ---------- boot ----------
+  readLocal();
+  render();
+
+  // A tab left open overnight used to keep showing yesterday. Watch the
+  // clock and re-render when the calendar day actually changes.
+  var shownDay = dateKey(new Date());
+  setInterval(function () {
+    var d = dateKey(new Date());
+    if (d !== shownDay) {
+      shownDay = d;
+      if (!editing) render();
+    }
+  }, 30000);
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("db").then(function (store) {
+      if (!store) { setSync("Saved on this device only"); return; }
+      db = store;
+      setSync("Synced across your devices");
+      // Anything changed before the store connected has to go up first,
+      // otherwise the first snapshot would overwrite it.
+      if (pendingLocal) persist();
+      db.doc("state/board").onSnapshot(function (snap) {
+        if (snap.metadata && snap.metadata.hasPendingWrites) return;
+        // Local changes that have not been written yet always win.
+        if (pendingLocal) return;
+        if (!snap.exists) { persist(); return; }
+        var data = snap.data() || {};
+        checked = data.checked || Object.create(null);
+        custom = Array.isArray(data.custom) ? data.custom : [];
+        pins = data.pins || Object.create(null);
+        edits = data.edits || Object.create(null);
+        writeLocal();
+        // Don't blow away a half-typed edit: the store also refreshes on a
+        // timer, and re-rendering mid-edit would wipe the open field.
+        if (!editing) render();
+      }, function () { setSync("Saved on this device only"); });
+    }).catch(function () { setSync("Saved on this device only"); });
+  } else {
+    setSync("Saved in this browser");
+  }
+})();
+</script>
+</body>
+</html>
