@@ -565,6 +565,68 @@
   .minibtn.danger { background: none; color: var(--crit); border-color: var(--crit); }
   .minibtn.danger:hover { background: var(--crit); color: var(--surface); }
 
+  /* ---------- sign in ---------- */
+  .authbtn {
+    font: 500 12px/1 var(--font-ui);
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 6px 11px;
+    cursor: pointer;
+  }
+
+  .authbtn:hover { background: var(--accent-soft); }
+  .authbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .veil {
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 30, 43, .55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 12px 40px rgba(16, 30, 43, .28);
+    padding: 26px 26px 22px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .card h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0 0 8px;
+    letter-spacing: -.01em;
+  }
+
+  .card p { margin: 0 0 16px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  .card input[type="email"] {
+    font: 400 15px/1.2 var(--font-ui);
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 11px 12px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .card input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .cardrow { display: flex; gap: 8px; align-items: center; }
+  .cardmsg { font-size: 13px; margin-top: 12px; color: var(--muted); line-height: 1.45; }
+  .cardmsg.bad { color: var(--crit); }
+  .cardmsg.good { color: var(--good); }
+
   /* ---------- add ---------- */
   .adder {
     display: flex;
@@ -692,13 +754,34 @@
   <footer class="foot">
     <span>Learning Suite and Canvas pulled Sep 2, 2026. Work and club items from Gmail, same day. FIN 326 had nothing posted.</span>
     <span class="sync" id="sync">Saved in this browser</span>
-    <span class="sync" id="build">Build 2026-09-04-live2</span>
+    <span class="sync" id="build">Build 2026-09-05-auth</span>
+    <span id="account"></span>
   </footer>
 </div>
 
+<div class="veil" id="signin" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="signin-h">
+    <h2 id="signin-h">Sign in to sync</h2>
+    <p>Your checkmarks and edits will follow you between your laptop and your phone. We email you a link, so there is no password to remember.</p>
+    <input type="email" id="signin-email" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
+    <div class="cardrow">
+      <button class="btn" type="button" id="signin-go">Email me a link</button>
+      <button class="minibtn ghost" type="button" id="signin-close">Not now</button>
+    </div>
+    <p class="cardmsg" id="signin-msg"></p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (function () {
   "use strict";
+
+  // Supabase project. The anon key is meant to live in public client code:
+  // on its own it grants nothing, because every table has row level security
+  // that only lets a signed-in person touch their own row.
+  var SUPABASE_URL = "https://bknsqbhsnbnbyamkfnhg.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrbnNxYmhzbmJuYnlhbWtmbmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1NTI1MzYsImV4cCI6MjEwNDEyODUzNn0.8j4-xIXS25bHHEdpfe4FdBYJIMnNiHbTDGDJb5dCDZ0";
 
   var COURSES = {
     fin400:  { label: "FIN 400",  hue: "var(--c-fin400)",  bucket: "classes" },
@@ -915,7 +998,6 @@
   var showPrep = false;
   var editing = null;
   var pendingLocal = false;
-  var db = null;
   var LS = "semester-board-v1";
 
   function snapshotState() {
@@ -939,19 +1021,31 @@
     try { window.localStorage.setItem(LS, JSON.stringify(snapshotState())); } catch (e) { /* fine */ }
   }
 
+  var saveTimer = null;
+
   function persist() {
     writeLocal();
     pendingLocal = true;
-    if (!db) { setSync("Saved on this device"); return; }
-    var body = snapshotState();
-    body.savedAt = new Date().toISOString();
+    if (!sb || !session) { setSync("Saved in this browser"); return; }
     setSync("Saving\u2026");
-    db.doc("state/board").set(body).then(function () {
+    // Batch rapid clicks into one write instead of one per checkbox.
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushState, 600);
+  }
+
+  function pushState() {
+    if (!sb || !session) return;
+    sb.from("boards").upsert({
+      user_id: session.user.id,
+      state: snapshotState(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" }).then(function (res) {
+      if (res.error) {
+        setSync("Saved here only, sync failed");
+        return;
+      }
       pendingLocal = false;
-      setSync("Saved " + fmtTime(new Date()));
-    }).catch(function () {
-      pendingLocal = false;
-      setSync("Saved on this device only");
+      setSync("Synced " + fmtTime(new Date()));
     });
   }
 
@@ -1500,33 +1594,134 @@
     }
   }, 30000);
 
-  if (window.claude && typeof window.claude.use === "function") {
-    window.claude.use("db").then(function (store) {
-      if (!store) { setSync("Saved on this device only"); return; }
-      db = store;
-      setSync("Synced across your devices");
-      // Anything changed before the store connected has to go up first,
-      // otherwise the first snapshot would overwrite it.
-      if (pendingLocal) persist();
-      db.doc("state/board").onSnapshot(function (snap) {
-        if (snap.metadata && snap.metadata.hasPendingWrites) return;
-        // Local changes that have not been written yet always win.
-        if (pendingLocal) return;
-        if (!snap.exists) { persist(); return; }
-        var data = snap.data() || {};
-        checked = data.checked || Object.create(null);
-        custom = Array.isArray(data.custom) ? data.custom : [];
-        pins = data.pins || Object.create(null);
-        edits = data.edits || Object.create(null);
+  // ---------- account and sync ----------
+  var sb = null;
+  var session = null;
+
+  function configured() {
+    return SUPABASE_ANON_KEY.indexOf("PASTE_") !== 0 && !!window.supabase;
+  }
+
+  function renderAccount() {
+    var el = document.getElementById("account");
+    if (!el) return;
+    el.innerHTML = "";
+    if (!configured()) return;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "authbtn";
+    if (session) {
+      b.textContent = "Sign out (" + session.user.email + ")";
+      b.addEventListener("click", function () {
+        sb.auth.signOut().then(function () {
+          session = null;
+          renderAccount();
+          setSync("Saved in this browser");
+        });
+      });
+    } else {
+      b.textContent = "Sign in to sync";
+      b.addEventListener("click", openSignIn);
+    }
+    el.appendChild(b);
+  }
+
+  function openSignIn() {
+    var veil = document.getElementById("signin");
+    veil.hidden = false;
+    document.getElementById("signin-msg").textContent = "";
+    document.getElementById("signin-email").focus();
+  }
+
+  function closeSignIn() { document.getElementById("signin").hidden = true; }
+
+  function wireSignIn() {
+    var go = document.getElementById("signin-go");
+    var close = document.getElementById("signin-close");
+    var email = document.getElementById("signin-email");
+    var msg = document.getElementById("signin-msg");
+    if (!go) return;
+
+    close.addEventListener("click", closeSignIn);
+    document.getElementById("signin").addEventListener("click", function (ev) {
+      if (ev.target.id === "signin") closeSignIn();
+    });
+    email.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") { ev.preventDefault(); go.click(); }
+      if (ev.key === "Escape") closeSignIn();
+    });
+
+    go.addEventListener("click", function () {
+      var addr = email.value.trim();
+      if (!addr) { email.focus(); return; }
+      msg.className = "cardmsg";
+      msg.textContent = "Sending\u2026";
+      go.disabled = true;
+      sb.auth.signInWithOtp({
+        email: addr,
+        options: { emailRedirectTo: window.location.href.split("#")[0] }
+      }).then(function (res) {
+        go.disabled = false;
+        if (res.error) {
+          msg.className = "cardmsg bad";
+          msg.textContent = res.error.message;
+          return;
+        }
+        msg.className = "cardmsg good";
+        msg.textContent = "Check " + addr + " and click the link. You can close this.";
+      });
+    });
+  }
+
+  // Pull the saved state down. Local work that has not synced yet wins,
+  // so signing in on a device you have been using does not lose anything.
+  function pullState() {
+    if (!sb || !session) return;
+    sb.from("boards").select("state").eq("user_id", session.user.id).maybeSingle()
+      .then(function (res) {
+        if (res.error) { setSync("Saved here only, sync failed"); return; }
+        if (!res.data || !res.data.state) { pushState(); return; }
+        if (pendingLocal) { pushState(); return; }
+        var d = res.data.state || {};
+        checked = d.checked || Object.create(null);
+        custom = Array.isArray(d.custom) ? d.custom : [];
+        pins = d.pins || Object.create(null);
+        edits = d.edits || Object.create(null);
         writeLocal();
-        // Don't blow away a half-typed edit: the store also refreshes on a
-        // timer, and re-rendering mid-edit would wipe the open field.
+        setSync("Synced " + fmtTime(new Date()));
         if (!editing) render();
-      }, function () { setSync("Saved on this device only"); });
-    }).catch(function () { setSync("Saved on this device only"); });
+      });
+  }
+
+  function onSession(s) {
+    session = s;
+    renderAccount();
+    if (session) {
+      closeSignIn();
+      pullState();
+    }
+  }
+
+  if (configured()) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    wireSignIn();
+    renderAccount();
+    setSync("Saved in this browser");
+
+    sb.auth.getSession().then(function (res) {
+      onSession(res.data ? res.data.session : null);
+    });
+    sb.auth.onAuthStateChange(function (_evt, s) { onSession(s); });
+
+    // Picking the phone back up should show what the laptop did.
+    window.addEventListener("focus", function () {
+      if (session && !editing && !pendingLocal) pullState();
+    });
   } else {
     setSync("Saved in this browser");
+    renderAccount();
   }
+
 })();
 </script>
 </body>
