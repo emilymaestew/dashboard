@@ -766,7 +766,7 @@
   <footer class="foot">
     <span>Learning Suite and Canvas pulled Sep 2, 2026. Work and club items from Gmail, same day. FIN 326 had nothing posted.</span>
     <span class="sync" id="sync">Saved in this browser</span>
-    <span class="sync" id="build">Build 2026-09-05-auth2</span>
+    <span class="sync" id="build">Build 2026-09-05-auth3</span>
     <span id="account"></span>
   </footer>
 </div>
@@ -1055,7 +1055,7 @@
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id" }).then(function (res) {
       if (res.error) {
-        setSync("Saved here only, sync failed");
+        setSync("Sync error: " + res.error.message);
         return;
       }
       pendingLocal = false;
@@ -1708,7 +1708,7 @@
     if (!sb || !session) return;
     sb.from("boards").select("state").eq("user_id", session.user.id).maybeSingle()
       .then(function (res) {
-        if (res.error) { setSync("Saved here only, sync failed"); return; }
+        if (res.error) { setSync("Sync error: " + res.error.message); return; }
         if (!res.data || !res.data.state) { pushState(); return; }
         if (pendingLocal) { pushState(); return; }
         var d = res.data.state || {};
@@ -1723,16 +1723,38 @@
   }
 
   function onSession(s) {
+    var was = !!session;
     session = s;
     renderAccount();
     if (session) {
       closeSignIn();
+      if (!was) setSync("Signed in, loading\u2026");
       pullState();
+      // Drop the token fragment so a refresh does not re-run the exchange.
+      if (window.history && window.history.replaceState && window.location.hash) {
+        window.history.replaceState({}, "", window.location.pathname + window.location.search);
+      }
     }
   }
 
   if (configured()) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: "pkce"
+      }
+    });
+
+    // A failed sign in used to do nothing visible. Say what happened.
+    (function reportAuthError() {
+      var q = new URLSearchParams(window.location.search);
+      var h = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      var err = q.get("error_description") || q.get("error")
+             || h.get("error_description") || h.get("error");
+      if (err) setSync("Sign in failed: " + err);
+    })();
     wireSignIn();
     renderAccount();
     setSync("Saved in this browser");
